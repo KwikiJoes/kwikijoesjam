@@ -11,5 +11,13 @@
     "url": "kwikijoesjam"
   },
   "author": "Kwiki Joe",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "fs": "^0.0.1-security",
+    "gsap": "^3.12.5",
+    "http": "^0.0.1-security",
+    "mysql2": "^3.9.1",
+    "socket.io": "^4.7.4"
+  }
 }
