@@ -1,18 +1,12 @@
 const express = require('express');
-//const fs = require('fs');
 const app = express();
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
 const mysql = require('mysql2');
-var fscontent = {};
-var socketgroups = {};
 var allsockets = [];
 
 //set listening port
 server.listen(1400, console.log('Listening on port: 1400'));
-
-//get logo svg file
-//fs.readFile(__dirname + '/public/images/loader.svg', 'utf8', function(err, cont){ if(err){ console.log(err); }else{ fscontent.loader = cont; } });
 
 //serve the page on request
 app.get('/', (req, res)=>{
@@ -20,25 +14,66 @@ app.get('/', (req, res)=>{
 });
 app.use(express.static('public'));
 
+//connect to database and get words
+var mycon = mysql.createConnection({
+  host: "127.0.0.1",
+  user: "root",
+  password: "",
+  database: "kjjam",
+});
+
 //server.io connection
 io.on('connection', (socket)=>{
-    //socket.emit('exsvg', fscontent);
-    
+    var verbs = [];
+    var adjectives = [];
+    var nouns = [];
+
     //set initial player variables
     allsockets.push(socket);
-    socket.yourname = '';
-	socket.game = '';
-    socket.isleader = 0;
-    socket.ready = 0;
-    socket.type = 'Nothing';
+    
+    //get all verbs
+    mycon.query("SELECT * FROM verbs", function(err, result){
+        if(err) throw err;
+        var stres = JSON.stringify(result);
+        var resar = JSON.parse(stres);
+        resar.forEach(row => {
+            verbs.push(row.word);
+        });
+        socket.emit('words', {type:'verbs', words:verbs });
+    });
+    
+    //get all adjectives
+    mycon.query("SELECT * FROM adjectives", function(err, result){
+        if(err) throw err;
+        var stres = JSON.stringify(result);
+        var resar = JSON.parse(stres);
+        resar.forEach(row => {
+            adjectives.push(row.word);
+        });
+        socket.emit('words', { type:'adjectives', words:adjectives });
+    });
+    
+    //get all nouns
+    mycon.query("SELECT * FROM nouns", function(err, result){
+        if(err) throw err;
+        var stres = JSON.stringify(result);
+        var resar = JSON.parse(stres);
+        resar.forEach(row => {
+            nouns.push(row.word);
+        });
+        socket.emit('words', { type:'nouns', words:nouns });
+    });
     
     //add comments
-    socket.on('sendMsg', data => {
-        if(socket.game != ''){
-            socketgroups[socket.game].forEach(soc => {
-                soc.emit('addToChat', {message:'<span class="chatname">' + (socket.yourname == '' ? socket.id : socket.yourname) + ':</span> ' + data, who:socket.yourname});
+    socket.on('sendIdea', data => {
+        let type = data.type == '(Noun}' ? 'nouns' : 'verbs';
+        type = data.type == '(Adjective)' ? 'adjectives' : type;
+        mycon.query("INSERT INTO " + type + " (word) VALUES (\"" + data.idea + "\")", function(err, result){
+            if(err) throw err;
+            allsockets.forEach(soc => {
+                soc.emit('addedword', data);
             });
-        }
+        });
     });
     
     
