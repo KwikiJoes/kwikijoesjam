@@ -16,10 +16,10 @@ app.use(express.static('public'));
 
 //connect to database and get words
 var mycon = mysql.createConnection({
-  host: "127.0.0.1",
-  user: "user",
-  password: "password",
-  database: "database",
+    host: "127.0.0.1",
+    user: "root",
+    password: "",
+    database: "kjjam",
 });
 
 //server.io connection
@@ -66,9 +66,7 @@ io.on('connection', (socket)=>{
     
     //add comments
     socket.on('sendIdea', data => {
-        let type = data.type == '(Noun}' ? 'nouns' : 'verbs';
-        type = data.type == '(Adjective)' ? 'adjectives' : type;
-        mycon.query("INSERT INTO " + type + " (word) VALUES (\"" + data.idea + "\")", function(err, result){
+        mycon.query("INSERT INTO " + data.type + " (word) VALUES (\"" + data.idea + "\")", function(err, result){
             if(err) throw err;
             allsockets.forEach(soc => {
                 soc.emit('addedword', data);
@@ -76,5 +74,10 @@ io.on('connection', (socket)=>{
         });
     });
     
-    
+    //on disconnect
+	socket.on('disconnect', () => {
+        for(var sc = 0; sc < allsockets.length; sc++){
+            if(allsockets[sc].id == socket.id) allsockets.splice(sc,1);
+        }
+	});
 });

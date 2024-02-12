@@ -285,6 +285,7 @@ body{
     appearance:none;
     width:100%;
     position:relative;
+    top:.3em;
     border:0;
     background:transparent;
     font-size:17px;
@@ -323,8 +324,7 @@ body{
 #nouns{ left:75%; }
 
 #wordtype{
-    color:#444;
-    font-size:.45em;
+    font-size:.4em;
     position:absolute;
     top:1.65em;
     font-style:italic;
@@ -429,7 +429,7 @@ body{
     z-index:250;
 }
 
-.button{
+.button, .butt{
     display:inline-block;
     vertical-align:bottom;
     width:2em;
@@ -446,6 +446,17 @@ body{
     box-shadow:.2em .25em .5em rgba(0,0,0,0.8);
 }
 
+.butt{
+    display:inline-block;
+    padding:.3em .5em;
+    width:auto;
+    height:auto;
+    border:0;
+    color:#fff;
+    margin:0 .1em;
+    box-shadow:.04em .06em .1em rgba(0,0,0,0.1);
+}
+
 .button:before{
     content:'';
     display:block;
@@ -458,7 +469,7 @@ body{
 
 .button *{ cursor:pointer; } 
 
-.button:hover{ background:#40732b; }
+.button:hover, .butt:hover{ background:#40732b; }
 
 .hovered{ background:#40732b !important; }
 .hovered .check{ stroke-dashoffset:0 !important; }

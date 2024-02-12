@@ -1,6 +1,7 @@
 var timerA = null;
 var socket = io({transports:['websocket'], upgrade:false});
 var resulted = false;
+var typetoadd = 'verbs';
 
 //list of drawers
 var drawers = [ 'Office Supplies', 'Paper', 'Straws', 'Buttons and beads', 'Colored Pencils', 'Craft kits', 'Pipe Cleaners', 'String', 'Tape', 'Unlabeled Drawer', 'Wooden Crafts', 'Popscicle Sticks', 'Erasers', 'Note Cards', 'Rubber Bands', 'Toothpicks', 'Clips', 'Scissors', 'Glue', 'Frames', 'Stamps', 'Shells and Animals', 'Individual Stickers', 'Sticker Sheets', 'Stickers' ];
@@ -37,11 +38,6 @@ document.addEventListener("DOMContentLoaded", () => {
     drawwords('drawers', drawers);
 });
 
-//focus text input on click anywhere
-/*document.addEventListener("click", () => {
-    hideshowinput();
-});*/
-
 //on window load
 window.addEventListener("load", () => {
     //hide page loader
@@ -58,15 +54,13 @@ socket.on('words', data => {
 
 //send app the idea
 function sendIdea(){
-    let types = ['Verb', 'Adjective', 'Noun'];
-    document.getElementById('wordtype').innerHTML = '(' + types[Math.floor(Math.random() * (types.length))] + ')';
     let idea = document.querySelector('textarea[name="words"]').value;
-    if(idea != '') socket.emit('sendIdea', {idea:idea, type:document.getElementById('wordtype').innerHTML });
+    if(idea != '' && idea != null && idea != undefined) socket.emit('sendIdea', {idea:idea, type:typetoadd });
 }
 
 //add word
 socket.on('addedword', data => {
-    addword(data.type.toString().replace('\(', '').replace('\)', '').toLowerCase(), data.idea);
+    addword(data.type.toString().replace('s', ''), data.idea);
 });
 
 //make mini cloud parts appear and disappear
@@ -80,9 +74,9 @@ function cloudsaction(){
 //hide and show the idea input
 function hideshowinput(){
     let elem = document.querySelector('#panelback');
-    let types = ['Verb', 'Adjective', 'Noun'];
+    //let types = ['Verb', 'Adjective', 'Noun'];
     if(elem.style.opacity == 0){
-        document.getElementById('wordtype').innerHTML = '(' + types[Math.floor(Math.random() * (types.length))] + ')';
+        //document.getElementById('wordtype').innerHTML = '(' + types[Math.floor(Math.random() * (types.length))] + ')';
         document.querySelector("textarea[name='words']").style.pointerEvents = 'all';
         if(timerA == null) timerA = setInterval(cloudsaction, Math.random() * 3000 + 2000);
         gsap.to('#cloudchain1', { opacity:1, scale:1, duration:.5, ease:'elastic.out' });
@@ -92,7 +86,7 @@ function hideshowinput(){
         document.querySelector("textarea[name='words']").focus();
         document.getElementById('closer').style.display = 'block';
     }else{
-        document.getElementById('wordtype').innerHTML = '';
+        //document.getElementById('wordtype').innerHTML = '';
         document.querySelector("textarea[name='words']").blur();
         document.querySelector("textarea[name='words']").style.pointerEvents = 'none';
         gsap.to(elem, { opacity:0, scale:.95, duration:.3, ease:'power1.in' });
@@ -105,6 +99,13 @@ function hideshowinput(){
         }});
         document.querySelector('textarea[name="words"]').value = '';
     }
+}
+
+//select type to add
+function settype(whi){
+    document.querySelectorAll('.butt').forEach(elem => { elem.classList.remove('hovered'); });
+    document.getElementById('b' + whi).classList.add('hovered');
+    typetoadd = whi + 's';
 }
 
 //shuffle array
@@ -139,7 +140,7 @@ function drawwords(type, arr){
         idea.style.left = l + '%';
         idea.style.top = t + '%';
         idea.style.zIndex = z;
-        //idea.style.filter = 'blur(' + ((5-per*2))+ 'px)';
+        idea.style.filter = 'blur(' + ((3-per*2))+ 'px)';
         
         idea.style.transform = 'scale(' + (per + .5) + ')';
         let c = Math.floor(per*80);
@@ -153,7 +154,7 @@ function drawwords(type, arr){
     }
 }
 
-//add one word
+//add one word to word group
 function addword(typew, word){
     //get z position
     let par = document.querySelector('#' + typew + 's');
@@ -171,6 +172,7 @@ function addword(typew, word){
     idea.style.left = l + '%';
     idea.style.top = t + '%';
     idea.style.zIndex = z;
+    idea.style.filter = 'blur(' + ((3-per*2))+ 'px)';
 
     idea.style.transform = 'scale(' + (per + .5) + ')';
     let c = Math.floor(per*80);
@@ -200,7 +202,7 @@ function getresults(){
             if(!drws.includes(elem)) gsap.to(elem, { opacity:.1, duration:.6, ease:'expo.out' });
         });
         drws.forEach((elem, index) => {
-            gsap.to(elem, { scale:2, zIndex:ds.length, left:'50%', translateX:'-50%', opacity:1, top:34 + (14*index) + '%', color:'rgba(255,255,255,1)', duration:.5, ease:'expo.inOut' });
+            gsap.to(elem, { scale:2, zIndex:ds.length, filter:'blur(0)', left:'50%', translateX:'-50%', opacity:1, top:34 + (14*index) + '%', color:'rgba(255,255,255,1)', duration:.5, ease:'expo.inOut' });
         });
 
         //get random verb
@@ -227,7 +229,7 @@ function getrandomword(arr){
     arr.forEach(elem => {
         if(elem != word) gsap.to(elem, { opacity:.1, duration:.6, ease:'expo.out' });
     });
-    gsap.to(word, { scale:2, zIndex:arr.length, left:'50%', translateX:'-50%', opacity:1, top:'45%', color:'rgba(255,255,255,1)', duration:.5, ease:'expo.inOut' });
+    gsap.to(word, { scale:2, zIndex:arr.length, filter:'blur(0)', left:'50%', translateX:'-50%', opacity:1, top:'45%', color:'rgba(255,255,255,1)', duration:.5, ease:'expo.inOut' });
 }
 
 function reset(){
