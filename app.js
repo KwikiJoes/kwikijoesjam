@@ -17,9 +17,9 @@ app.use(express.static('public'));
 //connect to database and get words
 var mycon = mysql.createConnection({
   host: "127.0.0.1",
-  user: "root",
-  password: "",
-  database: "kjjam",
+  user: "user",
+  password: "password",
+  database: "database",
 });
 
 //server.io connection
