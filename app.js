@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const app = express();
 const server = require('http').createServer(app);
@@ -6,7 +7,7 @@ const mysql = require('mysql2');
 var allsockets = [];
 
 //set listening port
-server.listen(1400, console.log('Listening on port: 1400'));
+server.listen(process.env.SERVER_PORT, console.log('Listening on port: ' + process.env.SERVER_PORT));
 
 //serve the page on request
 app.get('/', (req, res)=>{
@@ -16,10 +17,10 @@ app.use(express.static('public'));
 
 //connect to database and get words
 var mycon = mysql.createConnection({
-    host: "127.0.0.1",
-    user: "root",
-    password: "",
-    database: "kjjam",
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
 });
 
 //server.io connection
